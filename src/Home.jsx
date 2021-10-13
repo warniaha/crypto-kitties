@@ -1,11 +1,13 @@
 import React from 'react';
+import { UserContext } from './UserContext';
 
 function Home() {
-    debugger;
+    const {value, setValue} = React.useContext(UserContext);
     return (
         <div className="Home">
-            Home page
+            <h2>Home page</h2>
             <div>
+                {value}
             </div>
         </div>
     )

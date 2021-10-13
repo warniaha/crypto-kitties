@@ -1,11 +1,13 @@
 import React from 'react';
+import { UserContext } from './UserContext';
 
 function Test() {
-    debugger;
+    const {value, setValue} = React.useContext(UserContext);
     return (
         <div className="Test">
-            Test page
+            <h2>Test page</h2>
             <div>
+                {value}
             </div>
         </div>
     )
