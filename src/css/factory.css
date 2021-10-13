@@ -1,0 +1,38 @@
+.catBox {
+    background-color: #e2efff;
+    border-radius: 10px;
+    padding-top: 50px;
+    padding-left: 65px;
+    padding-bottom: 100px;
+}
+
+.cattributes {
+    padding: 25px;
+    background-color: #ededed;
+    border-radius: 10px;
+}
+
+.dnaDiv {
+    position: relative;
+    top: 90px;
+    bottom: 5px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    flex-direction: row;
+}
+
+#decorationMidColors {
+    flex-grow: 1;
+}
+
+#decorationEdgeColors {
+    flex-grow: 1;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
