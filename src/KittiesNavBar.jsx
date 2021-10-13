@@ -4,20 +4,20 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { LinkContainer } from 'react-router-bootstrap';
 
-function ContextNavBar() {
+function KittiesNavBar() {
   return (
     <Navbar bg="primary" variant="dark">
       <Container>
-        <Navbar.Brand href="#home">ContextTest</Navbar.Brand>
+        <Navbar.Brand href="#home">Kitties</Navbar.Brand>
         <Nav className="me-auto">
           <LinkContainer to="/">
             <Nav.Link href="/">Home</Nav.Link>
           </LinkContainer>
-          <LinkContainer to="/Test">
-            <Nav.Link href="/Test">Test</Nav.Link>
+          <LinkContainer to="/Catalog">
+            <Nav.Link href="/Catalog">Catalog</Nav.Link>
           </LinkContainer>
-          <LinkContainer to="/About">
-            <Nav.Link href="/About">About</Nav.Link>
+          <LinkContainer to="/Factory">
+            <Nav.Link href="/Factory">Factory</Nav.Link>
           </LinkContainer>
         </Nav>
       </Container>
@@ -25,4 +25,4 @@ function ContextNavBar() {
   );
 }
 
-export default ContextNavBar;
+export default KittiesNavBar;

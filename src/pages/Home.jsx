@@ -1,11 +1,11 @@
 import React from 'react';
-import { UserContext } from './UserContext';
+import { UserContext } from '../UserContext';
 
-function Test() {
+function Home() {
     const {value, setValue} = React.useContext(UserContext);
     return (
-        <div className="Test">
-            <h2>Test page</h2>
+        <div className="Home">
+            <h2>Home page</h2>
             <div>
                 {value}
             </div>
@@ -13,4 +13,4 @@ function Test() {
     )
 }
 
-export default Test;
+export default Home;

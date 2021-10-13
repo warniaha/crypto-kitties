@@ -1,15 +1,15 @@
 import React from 'react';
-import { UserContext } from './UserContext';
+import { UserContext } from '../UserContext';
 
-function About() {
+function Factory() {
     const {value, setValue} = React.useContext(UserContext);
     const onClick = (event) => {
         event.preventDefault();
         setValue("Value has been changed");
     }
     return (
-        <div className="About">
-            <h2>About page</h2>
+        <div className="Factory">
+            <h2>Factory page</h2>
             <div>
                 {value}
             </div>
@@ -18,4 +18,4 @@ function About() {
     )
 }
 
-export default About;
+export default Factory;
