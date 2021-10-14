@@ -5,7 +5,12 @@ function Cat(props) {
     const dna = decomposeDna(props.factoryDna);
 
     const getHeadColorStyle = () => {
-        return { "background": `#${getColor(dna.headcolor)}` };
+        if (dna.headcolor === "88") {
+            debugger;
+        }
+        const headColor = getColor(dna.headcolor);
+        console.log(`headColor: ${headColor}`)
+        return { "background": `#${headColor}` };
     }
 
     const getMouthColorStyle = () => {

@@ -1,4 +1,4 @@
-import { getColor } from '../js/colors';
+// import { getColor } from '../js/colors';
 
 export const defaultDNA = {
     "headcolor" : 10,

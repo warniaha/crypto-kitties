@@ -1,6 +1,6 @@
 import React from 'react';
 import Cat from '../components/Cat'
-import { buildDna, createRandomDna, defaultDnaString } from '../js/dna';
+import { defaultDnaString } from '../js/dna';
 import { KittiesContext } from '../KittiesContext';
 
 function Home() {
@@ -80,7 +80,8 @@ function Home() {
 
     }
 
-    const {value, setValue} = React.useContext(KittiesContext);
+    const { accounts, } = React.useContext(KittiesContext);
+    // console.log(`Home: ${JSON.stringify(store)}`);
     return (
         <div className="Home">
             <div className="container p-5">
@@ -104,7 +105,7 @@ function Home() {
             <br></br>
             <br></br>
             <br></br>
-            <div>KittyContext: {value}</div>
+            <div>KittyContext: {accounts}</div>
         </div>
     )
 }

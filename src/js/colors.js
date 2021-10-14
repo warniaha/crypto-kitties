@@ -1,4 +1,6 @@
 
+var assert = require('assert');
+
 var colors = {
 0: "ae494f",
 1: "9a3031",
@@ -88,7 +90,7 @@ var colors = {
 85: "86be6c",
 86: "e62102",
 87: "5471fc",
-88: "5c089",
+88: "05c089",
 89: "703c75",
 90: "9a8e8f",
 91: "8b9307",
@@ -105,5 +107,6 @@ export function getColor(color){
     if (typeof(color) === "string") {
         color = parseInt(color);
     }
+    assert(color >= 10 && color <= 98, `Color (${color}) is not within the expected range`);
     return colors[color];
 }

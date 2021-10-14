@@ -299,13 +299,9 @@ body {
     transform: rotate(-45deg);
 }
 
-.decorationColorsDiv {
+.flexDivRow {
     display: flex;
     flex-direction: row;
     flex-grow: 1;
+    justify-content: space-around;
 }
-
-/* .decorationColorsDiv {
-    display: flex;
-    flex-direction: row;
-} */

@@ -29,7 +29,7 @@ function Cattributes(props) {
                 <TabPanel>
                     <EyeShape setFactoryDna={props.setFactoryDna} factoryDna={factoryDna} />
                     <DecorationShape setFactoryDna={props.setFactoryDna} factoryDna={factoryDna} />
-                    <div className="decorationColorsDiv">
+                    <div className="flexDivRow">
                         <DecorationMidColor setFactoryDna={props.setFactoryDna} factoryDna={factoryDna} />
                         <DecorationEdgeColor setFactoryDna={props.setFactoryDna} factoryDna={factoryDna} />
                     </div>

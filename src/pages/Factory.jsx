@@ -8,11 +8,8 @@ import { KittiesContext } from '../KittiesContext';
 
 function Factory() {
     const [factoryDna, setFactoryDna] = React.useState(defaultDnaString);
-    const {value, setValue} = React.useContext(KittiesContext);
-    const onClick = (event) => {
-        event.preventDefault();
-        setValue("Value has been changed");
-    }
+    const { accounts, kittyContractInstance } = React.useContext(KittiesContext);
+    // console.log(`Factory: ${JSON.stringify(store)}`);
     const onClickRandom = (event) => {
         event.preventDefault();
         setFactoryDna(buildDna(createRandomDna()));
@@ -25,8 +22,19 @@ function Factory() {
     
     const onClickCreate = (event) => {
         event.preventDefault();
-        console.log("onClickCreate")
+        console.log(`Birthing kitty with factoryDna: ${factoryDna}`);
+        birthKitty(parseInt(factoryDna));
     }
+
+    const birthKitty = (dna) => {
+        kittyContractInstance.methods.createKittyGen0(dna).send({ from: accounts[0] }, function(error, txHash) {
+            if (error)
+                console.log(error);
+            else
+                console.log(txHash);
+        });
+    }
+    
     return (
         <div className="Factory">
             <div className="container p-5 catContainer">
@@ -50,9 +58,8 @@ function Factory() {
                 </div>
             </div>
             <div>
-                {value}
+                {JSON.stringify(accounts)}
             </div>
-            <button onClick={onClick}>Change context</button>
         </div>
     )
 }
