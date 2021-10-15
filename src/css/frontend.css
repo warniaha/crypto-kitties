@@ -20,6 +20,10 @@
     flex-wrap: nowrap;
 }
 
+.catalogCat {
+    transform:scale(0.75)
+}
+
 .homeButtonBar {
     display: flex;
     flex-direction: row;

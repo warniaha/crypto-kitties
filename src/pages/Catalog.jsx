@@ -51,7 +51,7 @@ function Catalog() {
             //  "mumId":"0","dadId":"0","generation":"0","genes":"2087534233176531","birthTime":"1634217850",
             //  "kittyOwner":"0x3a715d283cC6276a3023005D69608677792Fa04d","catId":"6","selected":false},
             return kittyIds.map(value => 
-                <div key={value.catId} >
+                <div className="catalogCat" key={value.catId} >
                     <button type="button" 
                         className={getButtonSelectedClass(value.selected)} 
                         onClick={() => onClickKitty(value.catId)} >
@@ -66,8 +66,6 @@ function Catalog() {
                             <div>Dad: {value.dadId}</div>
                         </div>
                     </button>
-                    <br></br>
-                    <br></br>
                 </div>
             );
         }

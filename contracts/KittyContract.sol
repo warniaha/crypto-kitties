@@ -70,6 +70,50 @@ contract KittyContract is IERC721, Ownable {
         return ownerToken[msg.sender];
     }
 
+    function extractDnaPart(uint256 dna, uint256 offset, uint256 digits) public pure returns (uint256) {
+        return dna / (10 ** offset) % (10 ** digits);
+    }
+
+    function extractHeadColor(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 14, 2);
+    }
+
+    function extractMouthColor(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 12, 2);
+    }
+
+    function extractEyesColor(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 10, 2);
+    }
+
+    function extractEarsColor(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 8, 2);
+    }
+
+    function extractEyeShape(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 7, 1);
+    }
+
+    function extractDecorationPattern(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 6, 1);
+    }
+
+    function extractDecorationMidColor(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 4, 2);
+    }
+
+    function extractDecorationEdgeColor(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 2, 2);
+    }
+
+    function extractAnimation(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 1, 1);
+    }
+
+    function extractLastnum(uint256 dna) public pure returns (uint256) {
+        return extractDnaPart(dna, 0, 1);
+    }
+
     function _mixDna(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
         uint256 dadPart = dadGenes / 100000000;
         uint256 mumPart = mumGenes % 100000000;
