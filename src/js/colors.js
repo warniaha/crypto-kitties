@@ -107,6 +107,8 @@ export function getColor(color){
     if (typeof(color) === "string") {
         color = parseInt(color);
     }
+    if (!(color >= 10 && color <= 98))
+        debugger;
     assert(color >= 10 && color <= 98, `Color (${color}) is not within the expected range`);
     return colors[color];
 }

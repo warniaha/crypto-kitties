@@ -5,6 +5,7 @@ import CatDna from '../components/CatDna';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { defaultDnaString, buildDna, createRandomDna } from '../js/dna';
 import { KittiesContext } from '../KittiesContext';
+import BigNumber from "bignumber.js";
 
 function Factory() {
     const [factoryDna, setFactoryDna] = React.useState(defaultDnaString);
@@ -23,13 +24,13 @@ function Factory() {
     const onClickCreate = (event) => {
         event.preventDefault();
         console.log(`Birthing kitty with factoryDna: ${factoryDna}`);
-        birthKitty(parseInt(factoryDna));
+        birthKitty(new BigNumber(factoryDna));
     }
 
     const birthKitty = (dna) => {
         kittyContractInstance.methods.createKittyGen0(dna).send({ from: accounts[0] }, function(error, txHash) {
             if (error)
-                console.log(error);
+                alert(error);
             else
                 console.log(txHash);
         });
@@ -37,11 +38,11 @@ function Factory() {
     
     return (
         <div className="Factory">
+            <div align="center">
+                <h1 className="c-white">Kitties-Factory</h1>
+                <p className="c-white">Create your custom Kitty</p>
+            </div>
             <div className="container p-5 catContainer">
-                <div align="center">
-                    <h1 className="c-white">Kitties-Factory</h1>
-                    <p className="c-white">Create your custom Kitty</p>
-                </div>
                 <div className="row">
                     <div className="col-lg-4 catBox m-2 light-b-shadow">
                         <Cat factoryDna={factoryDna} />
@@ -56,9 +57,6 @@ function Factory() {
                     </div>
                     <button type="button" className="btn btn-success" onClick={onClickCreate}>Create</button>
                 </div>
-            </div>
-            <div>
-                {JSON.stringify(accounts)}
             </div>
         </div>
     )

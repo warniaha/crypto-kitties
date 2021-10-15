@@ -1,8 +1,9 @@
 import React from 'react';
 import Cat from '../components/Cat';
 import { KittiesContext } from '../KittiesContext';
-import { decomposeDna } from "../js/dna";
 import { strict as assert } from 'assert';
+import { TransferToDialogContext } from '../dialogs/TransferToDialogContext';
+import TransferToDialog from '../dialogs/TransferToDialog';
 
 function Catalog() {
     const { accounts, kittyContractInstance } = React.useContext(KittiesContext);
@@ -99,18 +100,17 @@ function Catalog() {
         if (kittyContractInstance) {
             kittyContractInstance.methods.breed(sire.catId, dame.catId).send({ from: accounts[0] }, function(error, txHash) {
                 if (error)
-                    console.log(error);
+                    alert(error);
                 else
                     console.log(txHash);
             });
+            loadKittyIds();
         }
     }
 
-    const onClickTransfer = (event) => {
-        const ids = selectedCats.map((cat) => {
-            return cat.catId;
-        })
-        console.log(`onClickTransfer catIds: ${ids}`);
+    const onClickTransfer = async (event) => {
+        event.preventDefault();
+        setShowTransferToDialog(true);
     }
 
     const getBreedSelectedButtonState = () => {
@@ -122,22 +122,20 @@ function Catalog() {
         // false means enabled
         return selectedCats.length === 0;
     }
-    if (kittyIds) {
-        const id5 = kittyIds.find(cat => cat.catId === 5);
-        if (id5) {
-            const dna = decomposeDna(id5.genes);
-            console.log(`id 5 dna: ${JSON.stringify(dna)}`);
-        }
-    }
+    const [showTransferToDialog, setShowTransferToDialog] = React.useState(false);
+
     return (
         <div className="Catalog">
-            <h2>Kitties catalog</h2>
-            <h3>Select kitties to breed or transfer</h3>
-            <div className="container p-3 catalogCats">{displayOwnedCats()}</div>
-            <div className="homeButtonBar col-lg-11">
-                <button type="button" disabled={getBreedSelectedButtonState()} className="btn btn-primary" onClick={onClickBreedSelected}>Breed selected</button>
-                <button type="button" disabled={getTransferButtonState()} className="btn btn-primary" onClick={onClickTransfer}>Transfer</button>
-            </div>
+            <TransferToDialogContext.Provider value={{ showTransferToDialog, setShowTransferToDialog }}>
+                <h2>Kitties catalog</h2>
+                <h3>Select kitties to breed or transfer</h3>
+                <div className="container p-3 catalogCats">{displayOwnedCats()}</div>
+                <div className="homeButtonBar col-lg-11">
+                    <button type="button" disabled={getBreedSelectedButtonState()} className="btn btn-primary" onClick={onClickBreedSelected}>Breed selected</button>
+                    <button type="button" disabled={getTransferButtonState()} className="btn btn-primary" onClick={onClickTransfer}>Transfer</button>
+                </div>
+                <TransferToDialog reload={loadKittyIds} list={selectedCats.map(cat => cat.catId)} />
+            </TransferToDialogContext.Provider>
         </div>
     )
 }

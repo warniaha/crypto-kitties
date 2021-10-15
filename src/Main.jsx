@@ -1,10 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap/dist/js/bootstrap.min.js';
-// import 'jquery/dist/jquery.slim.min.js';
-// import 'jquery/dist/jquery.min.js';
-// import 'popper.js/dist/popper.min.js';
 
 import Factory from './pages/Factory';
 import Catalog from './pages/Catalog';
@@ -14,15 +9,13 @@ import { KittiesContext } from './KittiesContext';
 import { abi } from './abi.js';
 
 const Web3 = require("web3");
-const contractAddress = "0xae855AaAa34671CD2F912927BD5115EA10987F99";
+const contractAddress = "0xde77dcE0EB73E79a7ecd5B430Ea3d0B5D6FdbBd1";
 
 const Main = () => {
   const [value, setValue] = React.useState("Hello from useState/useContext");
   const [accounts, setAccounts] = React.useState();
   const [kittyContractInstance, setKittyContractInstance] = React.useState();
-  // const store = { values: value, setValue,
-  //                 accounts: accounts, setAccounts,
-  //                 contract: kittyContractInstance, setKittyContractInstance };
+
   if (accounts === undefined){
     window.ethereum.enable().then(accts => {
       console.log(`Accounts: ${accts}`)

@@ -60,7 +60,7 @@ contract KittyContract is IERC721, Ownable {
         require(msg.sender == _ownerOf(_mumId), "Mum kitty not owned by caller");
         Kitty storage dad = kittyList[_dadId];
         Kitty storage mum = kittyList[_mumId];
-        uint256 newDna = _mixDna(dad.genes, mum.genes);
+        uint256 newDna = mixDna(dad.genes, mum.genes);
         uint256 newGeneration = (dad.generation > mum.generation ? dad.generation : mum.generation) + 1;
         _createKitty(_mumId, _dadId, newGeneration, newDna, msg.sender);
         return kittyList.length - 1;
@@ -114,10 +114,29 @@ contract KittyContract is IERC721, Ownable {
         return extractDnaPart(dna, 0, 1);
     }
 
-    function _mixDna(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
-        uint256 dadPart = dadGenes / 100000000;
-        uint256 mumPart = mumGenes % 100000000;
-        return dadPart * 100000000 + mumPart;
+    function mergeColors(uint256 sire, uint256 dame) private pure returns (uint256) {
+        return mergeValues(sire, dame, 10, 98);
+    }
+
+    function mergeValues(uint256 sire, uint256 dame, uint256 min, uint256 max) private pure returns (uint256) {
+        uint256 mergedValue = (sire - min) ^ (dame - min);
+        while (mergedValue > (max-min)) {
+            mergedValue /= 2;
+        }
+        return mergedValue + min;
+    }
+
+    function mixDna(uint256 dadGenes, uint256 mumGenes) public pure returns (uint256) {
+        return (mergeColors(extractHeadColor(dadGenes), extractHeadColor(mumGenes)) * 10**14) +
+            (mergeColors(extractMouthColor(dadGenes), extractMouthColor(mumGenes)) * 10**12) +
+            (mergeColors(extractEyesColor(dadGenes), extractEyesColor(mumGenes)) * 10**10) +
+            (mergeColors(extractEarsColor(dadGenes), extractEarsColor(mumGenes)) * 10**8) +
+            (mergeValues(extractEyeShape(dadGenes), extractEyeShape(mumGenes), 1, 3) * 10**7) +
+            (mergeValues(extractEyeShape(dadGenes), extractEyeShape(mumGenes), 1, 3) * 10**6) +
+            (mergeColors(extractDecorationMidColor(dadGenes), extractDecorationMidColor(mumGenes)) * 10**4) +
+            (mergeColors(extractDecorationEdgeColor(dadGenes), extractDecorationEdgeColor(mumGenes)) * 10**2) +
+            (mergeValues(extractEyeShape(dadGenes), extractEyeShape(mumGenes), 1, 4) * 10**1) +
+            1;
     }
 
     function _createKitty(
