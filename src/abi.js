@@ -325,13 +325,7 @@ export var abi = [
       }
     ],
     "name": "breed",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -727,7 +721,7 @@ export var abi = [
     "outputs": [
       {
         "internalType": "address",
-        "name": "_owner",
+        "name": "",
         "type": "address"
       }
     ],

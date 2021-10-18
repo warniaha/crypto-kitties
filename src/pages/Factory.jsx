@@ -41,12 +41,13 @@ function Factory() {
 
     const ownedByOperator = (accounts && kittyContractOwner && kittyContractOwner.toLowerCase() === accounts[0].toLowerCase());
     const instructions = accounts ? (ownedByOperator ? createKittiesAsOwner : notContractOwner) : loadingAccounts;
+    const instructionClass = accounts ? (ownedByOperator ? "c-white" : "c-red") : "c-blue";
     
     return (
         <div className="Factory">
             <div align="center">
                 <h1 className="c-white">Kitties-Factory</h1>
-                <p className="c-white">{instructions}</p>
+                <p className={instructionClass}>{instructions}</p>
             </div>
             <div className="container p-5 catContainer">
                 <div className="row">

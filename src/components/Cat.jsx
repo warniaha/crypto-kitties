@@ -26,11 +26,11 @@ const eyeShapeType = {
     lookingUp: 3,
 };
 
-const animationEarSide = {
-    left: 0,
-    right: 1,
-    both: 2,
-};
+// const animationEarSide = {
+//     left: 0,
+//     right: 1,
+//     both: 2,
+// };
 
 function Cat(props) {
     const dna = decomposeDna(props.factoryDna);
@@ -54,7 +54,7 @@ function Cat(props) {
         if (dna.animation === animationType.ear) {
             if (side === sideWise.right) {
                 const duration = 1 / ((getAnimationModifier() % 10) + 1);
-                console.log(`right duration: ${duration} ${getAnimationModifier()} ${(getAnimationModifier() % 10) + 1}`)
+                // console.log(`right duration: ${duration} ${getAnimationModifier()} ${(getAnimationModifier() % 10) + 1}`)
                 animation = { "animation": `earTwitch ${1.6 + duration}s infinite`};
             }
         }

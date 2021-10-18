@@ -64,10 +64,7 @@ contract KittyContract is IERC721, Ownable {
         address payable originalOwner = address(uint160(_ownerOf(kittyId)));
         _safeTransfer(_ownerOf(kittyId), msg.sender, kittyId, "");
         originalOwner.transfer(msg.value);
-        if (tokenPrice[kittyId] != 0){
-            removeTokenForSale(kittyId);
-            delete kittyIndexToApproved[kittyId];
-        }
+        eraseTokenPrice(kittyId);
         emit Purchase(kittyId, originalOwner, msg.sender, msg.value);
     }
 
@@ -257,16 +254,6 @@ contract KittyContract is IERC721, Ownable {
             1;
     }
 
-    // function fnList(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256)[] = {
-    //     mixDnaZero,
-    //     mixDnaOne,
-    //     mixDnaTwo,
-    //     mixDnaThree,
-    //     mixDnaFour,
-    //     mixDnaFive,
-    //     mixDnaSix,
-    // };
-
     function mixDna(uint256 dadGenes, uint256 mumGenes) public view returns (uint256) {
         return mixDna(dadGenes, mumGenes, uint8(block.timestamp));
     }
@@ -277,24 +264,30 @@ contract KittyContract is IERC721, Ownable {
     }
 
     function mixDna(uint256 dadGenes, uint256 mumGenes, uint256 randomizer) public pure returns (uint256) {
+        uint256 genes;
         uint8 random = uint8(randomizer % mixVariantCount());
-        // return fnList[random](dadGenes, mumGenes);
         if (random == 0) {
-            return mixDnaZero(dadGenes, mumGenes);
+            genes = mixDnaZero(dadGenes, mumGenes);
         } else if (random == 1) {
-            return mixDnaOne(dadGenes, mumGenes);
+            genes = mixDnaOne(dadGenes, mumGenes);
         } else if (random == 2) {
-            return mixDnaTwo(dadGenes, mumGenes);
+            genes = mixDnaTwo(dadGenes, mumGenes);
         } else if (random == 3) {
-            return mixDnaThree(dadGenes, mumGenes);
+            genes = mixDnaThree(dadGenes, mumGenes);
         } else if (random == 4) {
-            return mixDnaFour(dadGenes, mumGenes);
+            genes = mixDnaFour(dadGenes, mumGenes);
         } else if (random == 5) {
-            return mixDnaFive(dadGenes, mumGenes);
+            genes = mixDnaFive(dadGenes, mumGenes);
         } else if (random == 6) {
-            return mixDnaSix(dadGenes, mumGenes);
+            genes = mixDnaSix(dadGenes, mumGenes);
+        } else {
+            require(false, "Internal error - Invalid random seed");
         }
-        require(false, "Internal error - Invalid random seed");
+        if (dadGenes == genes || mumGenes == genes) {
+            // not sure how this happens, but if the genes are identical to one of the parents, try using the merge one
+            genes = mixDnaFour(dadGenes, mumGenes);
+        }
+        return genes;
     }
 
     function _createKitty(
@@ -370,15 +363,15 @@ contract KittyContract is IERC721, Ownable {
         _transfer(msg.sender, to, tokenId);
     }
 
-    function removeTokenForSale(uint256 tokenId) internal {
-        removeItem(tokensForSale, tokenId);        
+    function removeTokenForSale(uint256 tokenId) internal returns (bool) {
+        return removeItem(tokensForSale, tokenId);        
     }
 
-    function removeOwnerToken(address from, uint256 tokenId) internal {
-        removeItem(ownerToken[from], tokenId);
+    function removeOwnerToken(address from, uint256 tokenId) internal returns (bool) {
+        return removeItem(ownerToken[from], tokenId);
     }
 
-    function removeItem(uint256[] storage array, uint256 tokenId) internal {
+    function removeItem(uint256[] storage array, uint256 tokenId) internal returns (bool) {
         uint256 index = array.length;    // init to invalid value
         for (uint256 loop = 0; loop < array.length; loop++)
         {
@@ -393,11 +386,14 @@ contract KittyContract is IERC721, Ownable {
             array[index] = array[array.length - 1];
             // Remove the last element
             array.pop();
+            return true;
         }
+        return false;
     }
 
     function eraseTokenPrice(uint256 tokenId) internal {
         if (tokenPrice[tokenId] != 0){
+            tokenPrice[tokenId] = 0;
             removeTokenForSale(tokenId);
             delete kittyIndexToApproved[tokenId];
         }

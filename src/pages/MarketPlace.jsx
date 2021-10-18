@@ -4,11 +4,18 @@ import { KittiesContext } from '../KittiesContext';
 import { strict as assert } from 'assert';
 import { loadKittyIds } from '../js/loadKittyIds';
 
+const Web3 = require("web3");
+
 function MarketPlace() {
     const { accounts, kittyContractInstance } = React.useContext(KittiesContext);
     const [ kittyIds, setKittyIds] = React.useState();
-    const getButtonSelectedClass = (selection) => {
-        return selection ? "btn btn-primary" : "btn btn-secondary";
+    const isOwner = (kittyOwner) => {
+        return (kittyOwner.toLowerCase() === accounts[0].toLowerCase());
+    }
+    const getButtonSelectedClass = (selection, kittyOwner) => {
+        if (isOwner(kittyOwner))
+            return "btn btn-secondary";
+        return selection ? "btn btn-primary" : "btn btn-success";
     }
     const onClickKitty = (id) => {
         const newKittyIds = kittyIds.map((cat) => {
@@ -21,12 +28,16 @@ function MarketPlace() {
         });
         setKittyIds(newKittyIds);
     }
-    const displayOwnedCats = () => {
+    /*
+        const from = selectedCats[0].kittyOwner.toLowerCase();
+        const to = accounts[0].toLowerCase();
+     */
+    const displayForSaleCats = () => {
         if (kittyIds) {
             return kittyIds.map(value => 
                 <div className="catalogCat" key={value.catId} >
-                    <button type="button" 
-                        className={getButtonSelectedClass(value.selected)} 
+                    <button type="button" disabled={isOwner(value.kittyOwner)}
+                        className={getButtonSelectedClass(value.selected, value.kittyOwner)} 
                         onClick={() => onClickKitty(value.catId)} >
                         <div className="catBox">
                             <Cat factoryDna={value.genes.toString()} />
@@ -66,7 +77,7 @@ function MarketPlace() {
     const selectedCats = getSelectedCats();
 
     const onClickPurchaseSelected = (event) => {
-        const kittyPrice = selectedCats[0].kittyPrice;
+        const kittyPrice = Web3.utils.toWei(selectedCats[0].price);
         const kittyId = selectedCats[0].catId;
         const from = selectedCats[0].kittyOwner.toLowerCase();
         const to = accounts[0].toLowerCase();
@@ -74,7 +85,7 @@ function MarketPlace() {
             alert(`You already own kitty ID ${kittyId}`);
             return;
         }
-        kittyContractInstance.purchaseKitty(kittyId).send({from: accounts[0], value: kittyPrice}, function(error, txHash) {
+        kittyContractInstance.methods.purchaseKitty(kittyId).send({from: accounts[0], value: kittyPrice}, function(error, txHash) {
             if (error)
                 alert(error.message);
             else
@@ -91,8 +102,8 @@ function MarketPlace() {
         <div className="MarketPlace">
             <h2>Kitties marketplace</h2>
             <h3>Select kitties to purchase</h3>
-            <div className="container p-3 catalogCats">{displayOwnedCats()}</div>
-            <div className="homeButtonBar col-lg-11">
+            <div className="container p-3 catalogCats">{displayForSaleCats()}</div>
+            <div align="center">
                 <button type="button" disabled={getPurchaseButtonState()} className="btn btn-primary" onClick={onClickPurchaseSelected}>Purchase Kitty</button>
             </div>
         </div>

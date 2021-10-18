@@ -43,30 +43,6 @@
     }
 }
 
-.twitchingEar0 {
-    animation: earTwitch 1.6s infinite;
-}
-
-.twitchingEar1 {
-    animation: earTwitch 1.8s infinite;
-}
-
-.twitchingEar2 {
-    animation: earTwitch 2s infinite;
-}
-
-.twitchingEar3 {
-    animation: earTwitch 2.2s infinite;
-}
-
-.twitchingEar4 {
-    animation: earTwitch 2.4s infinite;
-}
-
-.twitchingEar5 {
-    animation: earTwitch 2.6s infinite;
-}
-
 @keyframes earTwitch {
     0% {
         transform: rotate(170deg);

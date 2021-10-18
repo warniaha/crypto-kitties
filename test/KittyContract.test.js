@@ -272,6 +272,8 @@ contract("KittyContract", accounts => {
 
         it("Chuck to purchase kitty1", async () => {
             truffleAssert.passes(await kittyContract.purchaseKitty(kittyId1.toNumber()-1, {from: chuck, value: new BigNumber(oneEth)}));
+            truffleAssert.passes(kitty1Price = await kittyContract.getTokenPrice(kittyId1.toNumber()-1));
+            assert.equal(kitty1Price.toNumber(), 0, `After purchase the price should be 0, returned: ${kitty1Price.toNumber()}`);
         });
 
         it("Validate chuck's balance == 1", async () => {

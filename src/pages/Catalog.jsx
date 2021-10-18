@@ -54,6 +54,12 @@ function Catalog() {
     React.useEffect(() => {
         if (!kittyIds && kittyContractInstance && kittyContractInstance.methods) {
             loadKittyIds(accounts, kittyContractInstance, setKittyIds, kittyContractInstance.methods.getKittyList);
+            kittyContractInstance.events.Birth().on('data', function(event){
+                loadKittyIds(accounts, kittyContractInstance, setKittyIds, kittyContractInstance.methods.getKittyList);
+            });
+            kittyContractInstance.events.TokenPrice().on('data', function(event){
+                loadKittyIds(accounts, kittyContractInstance, setKittyIds, kittyContractInstance.methods.getKittyList);
+            });
         }
     }, [setKittyIds, accounts, kittyContractInstance, kittyIds])
 
