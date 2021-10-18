@@ -7,6 +7,8 @@ import "./IERC721Receiver.sol";
 contract KittyContract is IERC721, Ownable {
     event Birth(address owner, uint256 kittyId, uint256 mumId, uint256 dadId, uint256 genes);
     event ApprovalForAll(address owner, address operator, bool approved);
+    event TokenPrice(uint256 kittyId, uint256 tokenPrice);
+    event Purchase(uint256 kittyId, address from, address to, uint256 price);
 
     struct Kitty {
         uint256 genes;
@@ -18,6 +20,8 @@ contract KittyContract is IERC721, Ownable {
 
     mapping(address => uint256[]) ownerToken;
     mapping(uint256 => address) tokenOwner;
+    mapping(uint256 => uint256) tokenPrice;
+    uint256[] tokensForSale;
     Kitty[] kittyList;
     mapping (uint256 => address) public kittyIndexToApproved;
     mapping (address => mapping(address => bool)) private _operatorApprovals;
@@ -49,28 +53,68 @@ contract KittyContract is IERC721, Ownable {
         _;
     }
 
+    modifier ownerOfKitty(uint256 _tokenId) {
+        require(msg.sender == _ownerOf(_tokenId), "Only the owner can breed");
+        _;
+    }
+
+    function purchaseKitty(uint256 kittyId) external payable validKittyId(kittyId) {
+        require(tokenPrice[kittyId] != 0, "KittyId is not for sale");
+        require(tokenPrice[kittyId] <= msg.value, "Insufficient funds passed in to complete the transaction");
+        address payable originalOwner = address(uint160(_ownerOf(kittyId)));
+        _safeTransfer(_ownerOf(kittyId), msg.sender, kittyId, "");
+        originalOwner.transfer(msg.value);
+        if (tokenPrice[kittyId] != 0){
+            removeTokenForSale(kittyId);
+            delete kittyIndexToApproved[kittyId];
+        }
+        emit Purchase(kittyId, originalOwner, msg.sender, msg.value);
+    }
+
     function createKittyGen0(uint256 _genes) public onlyOwner {
         require(gen0Counter < CREATION_LIMIT_GEN0, "Generation zero limit exceeded");
         gen0Counter++;
         _createKitty(0, 0, 0, _genes, msg.sender);
     }
 
-    function breed(uint256 _dadId, uint256 _mumId) public validKittyId(_dadId) validKittyId(_mumId) returns (uint256) {
-        require(msg.sender == _ownerOf(_dadId), "Dad kitty not owned by caller");
-        require(msg.sender == _ownerOf(_mumId), "Mum kitty not owned by caller");
+    function getOwnerAddress() public view returns (address) {
+        return owner;
+    }
+
+    function getTokenPrice(uint256 kittyId) public validKittyId(kittyId) view returns (uint256) {
+        return tokenPrice[kittyId];
+    }
+
+    function setTokenPrice(uint256 kittyId, uint256 tokenCost) public validKittyId(kittyId) ownerOrOperatorApprover(msg.sender, kittyId) {
+        eraseTokenPrice(kittyId);   // in case it was already set, this causes a replacement
+        tokenPrice[kittyId] = tokenCost;
+        if (tokenCost > 0) {
+            tokensForSale.push(kittyId);
+            _approve(address(this), kittyId);
+        }
+        emit TokenPrice(kittyId, tokenCost);
+    }
+
+    function breed(uint256 _dadId, uint256 _mumId) public ownerOfKitty(_dadId) ownerOfKitty(_mumId)
+        validKittyId(_dadId) validKittyId(_mumId) {
         Kitty storage dad = kittyList[_dadId];
         Kitty storage mum = kittyList[_mumId];
-        uint256 newDna = mixDna(dad.genes, mum.genes);
+        uint256 newDna = mixDna(dad.genes, mum.genes, uint8(block.timestamp));
         uint256 newGeneration = (dad.generation > mum.generation ? dad.generation : mum.generation) + 1;
         _createKitty(_mumId, _dadId, newGeneration, newDna, msg.sender);
-        return kittyList.length - 1;
+        uint256 kittyId = kittyList.length - 1;
+        emit Birth(msg.sender, kittyId, _mumId, _dadId, newDna);
     }
 
     function getKittyList() public view returns (uint256[] memory) {
         return ownerToken[msg.sender];
     }
 
-    function extractDnaPart(uint256 dna, uint256 offset, uint256 digits) public pure returns (uint256) {
+    function getKittiesForSale() public view returns (uint256[] memory) {
+        return tokensForSale;
+    }
+
+    function extractDnaPart(uint256 dna, uint256 offset, uint256 digits) internal pure returns (uint256) {
         return dna / (10 ** offset) % (10 ** digits);
     }
 
@@ -114,29 +158,143 @@ contract KittyContract is IERC721, Ownable {
         return extractDnaPart(dna, 0, 1);
     }
 
+    function mixDnaZero(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
+        return (extractHeadColor(dadGenes) * 10**14) +
+            (extractMouthColor(mumGenes) * 10**12) +
+            (extractEyesColor(dadGenes) * 10**10) +
+            (extractEarsColor(mumGenes) * 10**8) +
+            (extractEyeShape(dadGenes) * 10**7) +
+            (extractDecorationPattern(mumGenes) * 10**6) +
+            (extractDecorationMidColor(dadGenes) * 10**4) +
+            (extractDecorationEdgeColor(mumGenes) * 10**2) +
+            (extractAnimation(dadGenes) * 10**1) +
+            1;
+    }
+
+    function mixDnaOne(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
+        return (extractHeadColor(mumGenes) * 10**14) +
+            (extractMouthColor(dadGenes) * 10**12) +
+            (extractEyesColor(mumGenes) * 10**10) +
+            (extractEarsColor(dadGenes) * 10**8) +
+            (extractEyeShape(mumGenes) * 10**7) +
+            (extractDecorationPattern(dadGenes) * 10**6) +
+            (extractDecorationMidColor(mumGenes) * 10**4) +
+            (extractDecorationEdgeColor(dadGenes) * 10**2) +
+            (extractAnimation(mumGenes) * 10**1) +
+            1;
+    }
+
+    function mixDnaTwo(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
+        return (extractHeadColor(dadGenes) * 10**14) +
+            (extractMouthColor(dadGenes) * 10**12) +
+            (extractEyesColor(mumGenes) * 10**10) +
+            (extractEarsColor(mumGenes) * 10**8) +
+            (extractEyeShape(dadGenes) * 10**7) +
+            (extractDecorationPattern(dadGenes) * 10**6) +
+            (extractDecorationMidColor(mumGenes) * 10**4) +
+            (extractDecorationEdgeColor(mumGenes) * 10**2) +
+            (extractAnimation(dadGenes) * 10**1) +
+            1;
+    }
+
+    function mixDnaThree(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
+        return (extractHeadColor(mumGenes) * 10**14) +
+            (extractMouthColor(mumGenes) * 10**12) +
+            (extractEyesColor(dadGenes) * 10**10) +
+            (extractEarsColor(dadGenes) * 10**8) +
+            (extractEyeShape(mumGenes) * 10**7) +
+            (extractDecorationPattern(mumGenes) * 10**6) +
+            (extractDecorationMidColor(dadGenes) * 10**4) +
+            (extractDecorationEdgeColor(dadGenes) * 10**2) +
+            (extractAnimation(mumGenes) * 10**1) +
+            1;
+    }
+
     function mergeColors(uint256 sire, uint256 dame) private pure returns (uint256) {
         return mergeValues(sire, dame, 10, 98);
     }
 
     function mergeValues(uint256 sire, uint256 dame, uint256 min, uint256 max) private pure returns (uint256) {
-        uint256 mergedValue = (sire - min) ^ (dame - min);
-        while (mergedValue > (max-min)) {
-            mergedValue /= 2;
-        }
-        return mergedValue + min;
+        return ((sire + dame) % (max-min)) + min;
     }
 
-    function mixDna(uint256 dadGenes, uint256 mumGenes) public pure returns (uint256) {
+    function mixDnaFour(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
         return (mergeColors(extractHeadColor(dadGenes), extractHeadColor(mumGenes)) * 10**14) +
             (mergeColors(extractMouthColor(dadGenes), extractMouthColor(mumGenes)) * 10**12) +
             (mergeColors(extractEyesColor(dadGenes), extractEyesColor(mumGenes)) * 10**10) +
             (mergeColors(extractEarsColor(dadGenes), extractEarsColor(mumGenes)) * 10**8) +
             (mergeValues(extractEyeShape(dadGenes), extractEyeShape(mumGenes), 1, 3) * 10**7) +
-            (mergeValues(extractEyeShape(dadGenes), extractEyeShape(mumGenes), 1, 3) * 10**6) +
+            (mergeValues(extractDecorationPattern(dadGenes), extractDecorationPattern(mumGenes), 1, 3) * 10**6) +
             (mergeColors(extractDecorationMidColor(dadGenes), extractDecorationMidColor(mumGenes)) * 10**4) +
             (mergeColors(extractDecorationEdgeColor(dadGenes), extractDecorationEdgeColor(mumGenes)) * 10**2) +
-            (mergeValues(extractEyeShape(dadGenes), extractEyeShape(mumGenes), 1, 4) * 10**1) +
+            (mergeValues(extractAnimation(dadGenes), extractAnimation(mumGenes), 1, 4) * 10**1) +
             1;
+    }
+
+    function mixDnaFive(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
+        return (mergeColors(extractHeadColor(dadGenes), extractHeadColor(mumGenes)) * 10**14) +
+            (extractMouthColor(mumGenes) * 10**12) +
+            (mergeColors(extractEyesColor(dadGenes), extractEyesColor(mumGenes)) * 10**10) +
+            (extractEarsColor(dadGenes) * 10**8) +
+            (mergeValues(extractEyeShape(dadGenes), extractEyeShape(mumGenes), 1, 3) * 10**7) +
+            (extractDecorationPattern(mumGenes) * 10**6) +
+            (mergeColors(extractDecorationMidColor(dadGenes), extractDecorationMidColor(mumGenes)) * 10**4) +
+            (extractDecorationEdgeColor(dadGenes) * 10**2) +
+            (mergeValues(extractAnimation(dadGenes), extractAnimation(mumGenes), 1, 4) * 10**1) +
+            1;
+    }
+
+    function mixDnaSix(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256) {
+        return (extractHeadColor(mumGenes) * 10**14) +
+            (mergeColors(extractMouthColor(dadGenes), extractMouthColor(mumGenes)) * 10**12) +
+            (extractEyesColor(dadGenes) * 10**10) +
+            (mergeColors(extractEarsColor(dadGenes), extractEarsColor(mumGenes)) * 10**8) +
+            (extractEyeShape(mumGenes) * 10**7) +
+            (mergeValues(extractDecorationPattern(dadGenes), extractDecorationPattern(mumGenes), 1, 3) * 10**6) +
+            (extractDecorationMidColor(dadGenes) * 10**4) +
+            (mergeColors(extractDecorationEdgeColor(dadGenes), extractDecorationEdgeColor(mumGenes)) * 10**2) +
+            (extractAnimation(mumGenes) * 10**1) +
+            1;
+    }
+
+    // function fnList(uint256 dadGenes, uint256 mumGenes) internal pure returns (uint256)[] = {
+    //     mixDnaZero,
+    //     mixDnaOne,
+    //     mixDnaTwo,
+    //     mixDnaThree,
+    //     mixDnaFour,
+    //     mixDnaFive,
+    //     mixDnaSix,
+    // };
+
+    function mixDna(uint256 dadGenes, uint256 mumGenes) public view returns (uint256) {
+        return mixDna(dadGenes, mumGenes, uint8(block.timestamp));
+    }
+
+    function mixVariantCount() public pure returns (uint256) {
+        return 7;
+        // return fnList.length;
+    }
+
+    function mixDna(uint256 dadGenes, uint256 mumGenes, uint256 randomizer) public pure returns (uint256) {
+        uint8 random = uint8(randomizer % mixVariantCount());
+        // return fnList[random](dadGenes, mumGenes);
+        if (random == 0) {
+            return mixDnaZero(dadGenes, mumGenes);
+        } else if (random == 1) {
+            return mixDnaOne(dadGenes, mumGenes);
+        } else if (random == 2) {
+            return mixDnaTwo(dadGenes, mumGenes);
+        } else if (random == 3) {
+            return mixDnaThree(dadGenes, mumGenes);
+        } else if (random == 4) {
+            return mixDnaFour(dadGenes, mumGenes);
+        } else if (random == 5) {
+            return mixDnaFive(dadGenes, mumGenes);
+        } else if (random == 6) {
+            return mixDnaSix(dadGenes, mumGenes);
+        }
+        require(false, "Internal error - Invalid random seed");
     }
 
     function _createKitty(
@@ -197,45 +355,62 @@ contract KittyContract is IERC721, Ownable {
      *
      * - `tokenId` must exist.
      */
-    function ownerOf(uint256 tokenId) external view validKittyId(tokenId) returns (address _owner) {
+    function ownerOf(uint256 tokenId) external view validKittyId(tokenId) returns (address) {
         return _ownerOf(tokenId);
     }
 
-    function _ownerOf(uint256 tokenId) internal view returns (address _owner) {
+    function _ownerOf(uint256 tokenId) internal view returns (address) {
         return tokenOwner[tokenId];
     }
 
     function transfer(address to, uint256 tokenId) external {
         require(to != address(0), "To address can't be zero");
         require(_ownerOf(tokenId) == msg.sender, "Only owner can transfer");
+        require(to != _ownerOf(tokenId), "Attempt to transfer to self");
         _transfer(msg.sender, to, tokenId);
     }
 
-    function removeItem(address from, uint256 tokenId) internal {
-        uint256 index = ownerToken[from].length;    // init to invalid value
-        for (uint256 loop = 0; loop < ownerToken[from].length; loop++)
+    function removeTokenForSale(uint256 tokenId) internal {
+        removeItem(tokensForSale, tokenId);        
+    }
+
+    function removeOwnerToken(address from, uint256 tokenId) internal {
+        removeItem(ownerToken[from], tokenId);
+    }
+
+    function removeItem(uint256[] storage array, uint256 tokenId) internal {
+        uint256 index = array.length;    // init to invalid value
+        for (uint256 loop = 0; loop < array.length; loop++)
         {
-            if (ownerToken[from][loop] == tokenId) {
+            if (array[loop] == tokenId) {
                 index = loop;
                 break;
             }
         }
-        require(index != ownerToken[from].length, "tokenId not found to remove");
-        // Move the last element into the place to delete
-        ownerToken[from][index] = ownerToken[from][ownerToken[from].length - 1];
-        // Remove the last element
-        ownerToken[from].pop();
+        // do nothing if it wasn't found, Ex: (index == array.length)
+        if (index != array.length) {
+            // Move the last element into the place to delete
+            array[index] = array[array.length - 1];
+            // Remove the last element
+            array.pop();
+        }
     }
 
+    function eraseTokenPrice(uint256 tokenId) internal {
+        if (tokenPrice[tokenId] != 0){
+            removeTokenForSale(tokenId);
+            delete kittyIndexToApproved[tokenId];
+        }
+    }
 
     function _transfer(address from, address to, uint256 tokenId) internal {
         if (from != address(0)) {
-            removeItem(from, tokenId);
+            removeOwnerToken(from, tokenId);
             delete kittyIndexToApproved[tokenId];
         }
         ownerToken[to].push(tokenId);
         tokenOwner[tokenId] = to;
-    
+        eraseTokenPrice(tokenId);
         emit Transfer(from, to, tokenId);
     }
 
@@ -261,6 +436,7 @@ contract KittyContract is IERC721, Ownable {
         require(_approved != address(0), "Invalid approval address");
         _approve(_approved, _tokenId);
     }
+
     function _approve(address _approved, uint256 _tokenId) internal {
         kittyIndexToApproved[_tokenId] = _approved;
         emit Approval(msg.sender, _approved, _tokenId);

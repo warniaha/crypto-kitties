@@ -7,10 +7,13 @@ import { defaultDnaString, buildDna, createRandomDna } from '../js/dna';
 import { KittiesContext } from '../KittiesContext';
 import BigNumber from "bignumber.js";
 
+const loadingAccounts = "Loading the accounts, please wait...";
+const notContractOwner = "You are not the contract owner and will not be able to create kitties in this factory";
+const createKittiesAsOwner = "Create your custom Kitty";
+
 function Factory() {
     const [factoryDna, setFactoryDna] = React.useState(defaultDnaString);
-    const { accounts, kittyContractInstance } = React.useContext(KittiesContext);
-    // console.log(`Factory: ${JSON.stringify(store)}`);
+    const { accounts, kittyContractInstance, kittyContractOwner } = React.useContext(KittiesContext);
     const onClickRandom = (event) => {
         event.preventDefault();
         setFactoryDna(buildDna(createRandomDna()));
@@ -23,24 +26,27 @@ function Factory() {
     
     const onClickCreate = (event) => {
         event.preventDefault();
-        console.log(`Birthing kitty with factoryDna: ${factoryDna}`);
         birthKitty(new BigNumber(factoryDna));
     }
 
     const birthKitty = (dna) => {
         kittyContractInstance.methods.createKittyGen0(dna).send({ from: accounts[0] }, function(error, txHash) {
-            if (error)
-                alert(error);
+            if (error) {
+                alert(error.message);
+            }
             else
                 console.log(txHash);
         });
     }
+
+    const ownedByOperator = (accounts && kittyContractOwner && kittyContractOwner.toLowerCase() === accounts[0].toLowerCase());
+    const instructions = accounts ? (ownedByOperator ? createKittiesAsOwner : notContractOwner) : loadingAccounts;
     
     return (
         <div className="Factory">
             <div align="center">
                 <h1 className="c-white">Kitties-Factory</h1>
-                <p className="c-white">Create your custom Kitty</p>
+                <p className="c-white">{instructions}</p>
             </div>
             <div className="container p-5 catContainer">
                 <div className="row">
@@ -55,7 +61,7 @@ function Factory() {
                         <button type="button" className="btn btn-primary" onClick={onClickRandom}>Random</button>
                         <button type="button" className="btn btn-primary" onClick={onClickDefault}>Default</button>
                     </div>
-                    <button type="button" className="btn btn-success" onClick={onClickCreate}>Create</button>
+                    <button disabled={!ownedByOperator} type="button" className="btn btn-success" onClick={onClickCreate}>Create</button>
                 </div>
             </div>
         </div>

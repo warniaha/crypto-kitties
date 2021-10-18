@@ -1,7 +1,6 @@
 import React from 'react';
 import Cat from '../components/Cat'
 import { defaultDnaString } from '../js/dna';
-import { KittiesContext } from '../KittiesContext';
 
 function Home() {
     const dna1 = "4974533712209821";
@@ -80,8 +79,6 @@ function Home() {
 
     }
 
-    const { accounts, } = React.useContext(KittiesContext);
-    // console.log(`Home: ${JSON.stringify(store)}`);
     return (
         <div className="Home">
             <div className="container p-5">
@@ -105,7 +102,6 @@ function Home() {
             <br></br>
             <br></br>
             <br></br>
-            <div>KittyContext: {accounts}</div>
         </div>
     )
 }

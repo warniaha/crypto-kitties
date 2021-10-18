@@ -1,14 +1,41 @@
-.movingHead {
+.movingHead0 {
+    animation: moveHead 3.7s infinite;
+}
+
+.movingHead1 {
+    animation: moveHead 4s infinite;
+}
+
+.movingHead2 {
+    animation: moveHead 4.3s infinite;
+}
+
+.movingHead3 {
+    animation: moveHead 4.6s infinite;
+}
+
+.movingHead4 {
     animation: moveHead 5s infinite;
+}
+
+.movingHead5 {
+    animation: moveHead 5.3s infinite;
+}
+
+.movingHead6 {
+    animation: moveHead 5.6s infinite;
 }
 @keyframes moveHead {
     0% {
         transform: rotate(0deg);
     }
-    33% {
+    25% {
         transform: rotate(5deg);
     }
-    66% {
+    50% {
+        transform: rotate(0deg);
+    }
+    75% {
         transform: rotate(-5deg);
     }
     100% {
@@ -16,8 +43,28 @@
     }
 }
 
-.twitchingEar {
+.twitchingEar0 {
+    animation: earTwitch 1.6s infinite;
+}
+
+.twitchingEar1 {
+    animation: earTwitch 1.8s infinite;
+}
+
+.twitchingEar2 {
     animation: earTwitch 2s infinite;
+}
+
+.twitchingEar3 {
+    animation: earTwitch 2.2s infinite;
+}
+
+.twitchingEar4 {
+    animation: earTwitch 2.4s infinite;
+}
+
+.twitchingEar5 {
+    animation: earTwitch 2.6s infinite;
 }
 
 @keyframes earTwitch {
@@ -41,8 +88,24 @@
     }
 }
 
-.movingTail {
+.movingTail0 {
+    animation: moveTail 450ms infinite;
+}
+
+.movingTail1 {
     animation: moveTail 500ms infinite;
+}
+
+.movingTail2 {
+    animation: moveTail 550ms infinite;
+}
+
+.movingTail3 {
+    animation: moveTail 600ms infinite;
+}
+
+.movingTail4 {
+    animation: moveTail 650ms infinite;
 }
 
 @keyframes moveTail {

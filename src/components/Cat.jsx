@@ -1,6 +1,37 @@
 import { decomposeDna } from "../js/dna";
 import { getColor } from '../js/colors';
 
+const sideWise = {
+    left: 0, 
+    right: 1,
+    none: 2,
+};
+
+const animationType = {
+    none: 1,
+    head: 2,
+    ear: 3,
+    tail: 4,
+};
+
+const decorationPatternType = {
+    none: 1,
+    slick: 2,
+    mean: 3,
+};
+
+const eyeShapeType = {
+    normal: 1,
+    chill: 2,
+    lookingUp: 3,
+};
+
+const animationEarSide = {
+    left: 0,
+    right: 1,
+    both: 2,
+};
+
 function Cat(props) {
     const dna = decomposeDna(props.factoryDna);
 
@@ -18,17 +49,26 @@ function Cat(props) {
         return {...background, ...shape};
     }
 
-    const getEarsColorStyle = () => {
-        return { "background": `#${getColor(dna.earsColor)}` };
+    const getEarsStyle = (side) => {
+        var animation;
+        if (dna.animation === animationType.ear) {
+            if (side === sideWise.right) {
+                const duration = 1 / ((getAnimationModifier() % 10) + 1);
+                console.log(`right duration: ${duration} ${getAnimationModifier()} ${(getAnimationModifier() % 10) + 1}`)
+                animation = { "animation": `earTwitch ${1.6 + duration}s infinite`};
+            }
+        }
+        const background = { "background": `#${getColor(dna.earsColor)}` };
+        return  { ...background, ...animation };
     }
-
+    
     const getEyeShapeStyle = (num) => {
         switch (num) {
-            case 1:
+            case eyeShapeType.normal:
                 return { 'border': 'none' };
-            case 2:
+            case eyeShapeType.chill:
                 return { 'borderTop': '15px solid' };
-            case 3:
+            case eyeShapeType.lookingUp:
                 return { 'borderBottom': '15px solid' };
             default:
                 throw Object.assign(new Error(`Unexpected eye shape: ${num}`), { code: 402 });
@@ -48,28 +88,23 @@ function Cat(props) {
         return { ...background, ...transform };
     }
 
-    const decorationEdge = {
-        left: 0, 
-        right: 1
-    };
-
     const getDecorationEdgeStyle = (decorationType) => {
         const background = { "background": `#${getColor(dna.decorationSidescolor)}` };
         var rotation;
         var firstBorderRadius;
         var secondBorderRadius;
         switch (dna.decorationPattern) {
-            case 1:
+            case decorationPatternType.none:
                 rotation = 0;
                 secondBorderRadius = firstBorderRadius = "0 0 50% 50%";
                 break;
-            case 2:
-                rotation = decorationType === decorationEdge.left ? 15 : -15;
+            case decorationPatternType.slick:
+                rotation = decorationType === sideWise.left ? 15 : -15;
                 firstBorderRadius = "50% 0 50% 50%";
                 secondBorderRadius = "0 50% 50% 50%";
                 break;
-            case 3:
-                rotation = decorationType === decorationEdge.left ? -15 : 15;
+            case decorationPatternType.mean:
+                rotation = decorationType === sideWise.left ? -15 : 15;
                 firstBorderRadius = "0 50% 50% 50%";
                 secondBorderRadius = "50% 0 50% 50%";
                 break;
@@ -82,31 +117,27 @@ function Cat(props) {
             "height": "55px",
             "width": "14px",
             "top": "1px",
-            "borderRadius": decorationType === decorationEdge.left ? firstBorderRadius : secondBorderRadius,
+            "borderRadius": decorationType === sideWise.left ? firstBorderRadius : secondBorderRadius,
         };
         return { ...background, ...transform };
     }
 
-    const getRightEarClass = () => {
-        var nameOfClass = "cat__ear--right";
-        if (dna.animation === 3) {
-            nameOfClass += " twitchingEar";
-        }
-        return nameOfClass;
+    const getAnimationModifier = () => {
+        return dna.headcolor + dna.mouthColor + dna.eyesColor + dna.earsColor;
     }
 
     const getHeadClass = () => {
         var nameOfClass = "cat__head";
-        if (dna.animation === 2) {
-            nameOfClass += " movingHead";
+        if (dna.animation === animationType.head) {
+            nameOfClass += " movingHead" + (getAnimationModifier() % 7);
         }
         return nameOfClass;
     }
 
     const getTailClass = () => {
         var nameOfClass = "cat__tail";
-        if (dna.animation === 4) {
-            nameOfClass += " movingTail";
+        if (dna.animation === animationType.tail) {
+            nameOfClass += " movingTail" + (getAnimationModifier() % 5);
         }
         return nameOfClass;
     }
@@ -114,17 +145,17 @@ function Cat(props) {
     return (
         <div className="cat" style={props.style}>
             <div className="cat__ear">
-                <div id="leftEar" className="cat__ear--left"  style={getEarsColorStyle()}>
+                <div id="leftEar" className="cat__ear--left"  style={getEarsStyle(sideWise.left)}>
                     <div className="cat__ear--left-inside"></div>
                 </div>
-                <div id="rightEar" className={getRightEarClass()} style={getEarsColorStyle()}>
+                <div id="rightEar" className="cat__ear--right" style={getEarsStyle(sideWise.right)}>
                     <div className="cat__ear--right-inside"></div>
                 </div>
             </div>
             <div id="head" className={getHeadClass()} style={getHeadColorStyle()}>
                 <div id="midDot" className="cat__head-dots" style={getDecorationMidStyle()}>
-                    <div id="leftDot" className="cat__head-dots_first" style={getDecorationEdgeStyle(decorationEdge.left)}></div>
-                    <div id="rightDot" className="cat__head-dots_second" style={getDecorationEdgeStyle(decorationEdge.right)}></div>
+                    <div id="leftDot" className="cat__head-dots_first" style={getDecorationEdgeStyle(sideWise.left)}></div>
+                    <div id="rightDot" className="cat__head-dots_second" style={getDecorationEdgeStyle(sideWise.right)}></div>
                 </div>
                 <div className="cat__eye">
                     <div className="cat__eye--left">
@@ -144,10 +175,10 @@ function Cat(props) {
             <div className="cat__body">
                 <div className="cat__chest" style={getHeadColorStyle()}></div>
                 <div className="cat__chest_inner" style={getMouthColorStyle()}></div>
-                <div className="cat__paw-left" style={getEarsColorStyle()}></div>
-                <div className="cat__paw-left_inner" style={getEarsColorStyle()}></div>
-                <div className="cat__paw-right" style={getEarsColorStyle()}></div>
-                <div className="cat__paw-right_inner" style={getEarsColorStyle()}></div>
+                <div className="cat__paw-left" style={getEarsStyle(sideWise.none)}></div>
+                <div className="cat__paw-left_inner" style={getEarsStyle(sideWise.none)}></div>
+                <div className="cat__paw-right" style={getEarsStyle(sideWise.none)}></div>
+                <div className="cat__paw-right_inner" style={getEarsStyle(sideWise.none)}></div>
                 <div id="tail" className={getTailClass()} style={getMouthColorStyle()}></div>
             </div>
         </div>

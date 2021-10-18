@@ -1,7 +1,7 @@
 
 var assert = require('assert');
 
-var colors = {
+export const colorSet = {
 0: "ae494f",
 1: "9a3031",
 2: "8cd42e",
@@ -29,7 +29,7 @@ var colors = {
 24: "adeacc",
 25: "cf2b03",
 26: "b3c459",
-27: "353f9",
+27: "0353f9",
 28: "5d4993",
 29: "ba8d15",
 30: "da2457",
@@ -52,7 +52,7 @@ var colors = {
 47: "8342ff",
 48: "2b4ab4",
 49: "ad4595",
-50: "bae4f",
+50: "0bae4f",
 51: "b76d01",
 52: "8e8207",
 53: "285b9f",
@@ -110,5 +110,5 @@ export function getColor(color){
     if (!(color >= 10 && color <= 98))
         debugger;
     assert(color >= 10 && color <= 98, `Color (${color}) is not within the expected range`);
-    return colors[color];
+    return colorSet[color];
 }

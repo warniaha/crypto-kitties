@@ -19,6 +19,9 @@ function KittiesNavBar() {
           <LinkContainer to="/Factory">
             <Nav.Link href="/Factory">Factory</Nav.Link>
           </LinkContainer>
+          <LinkContainer to="/MarketPlace">
+            <Nav.Link href="/MarketPlace">Market Place</Nav.Link>
+          </LinkContainer>
         </Nav>
       </Container>
     </Navbar>

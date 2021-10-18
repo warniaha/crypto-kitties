@@ -21,12 +21,12 @@ export default function TransferToDialog(props) {
         props.list.map((cat) => {
             kittyContractInstance.methods.safeTransferFrom(accounts[0], transferToAddress, cat).send({ from: accounts[0] }, function(error, txHash) {
                 if (error)
-                    alert(error);
+                    alert(error.message);
                 else
                     console.log(txHash);
             });
+            return undefined;
         });
-        props.reload();
         handleClose();
     }
 

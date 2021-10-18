@@ -3,39 +3,18 @@ import Cat from '../components/Cat';
 import { KittiesContext } from '../KittiesContext';
 import { strict as assert } from 'assert';
 import { TransferToDialogContext } from '../dialogs/TransferToDialogContext';
+import { MarketPriceDialogContext } from '../dialogs/MarketPriceDialogContext';
 import TransferToDialog from '../dialogs/TransferToDialog';
+import MarketPriceDialog from '../dialogs/MarketPriceDialog';
+import { loadKittyIds } from '../js/loadKittyIds';
 
 function Catalog() {
     const { accounts, kittyContractInstance } = React.useContext(KittiesContext);
     const [ kittyIds, setKittyIds] = React.useState();
-    const loadKittyIds = async () => {
-        if (kittyContractInstance) {
-            kittyContractInstance.methods.getKittyList().call({ from: accounts[0] }).then(async (kitties) => {
-                if (kitties.length > 0) {
-                    const kittyPromises = kitties.map(value => {
-                        return kittyContractInstance.methods.getKitty(value).call({ from: accounts[0]});
-                    });
-                    const kittyData = await Promise.all(kittyPromises);
-                    if (kittyData.length > 0) {
-                        const catData = kittyData.map(cat => {
-                            const selected = false;
-                            return {...cat, selected};
-                        });
-                        console.log(`catData: ${JSON.stringify(catData)}`);
-                        setKittyIds(catData);
-                    }
-                }
-            }
-            , error => {
-                console.log(`error: ${error}`);
-            });
-        }
-    }
     const getButtonSelectedClass = (selection) => {
         return selection ? "btn btn-primary" : "btn btn-secondary";
     }
     const onClickKitty = (id) => {
-        console.log(`onClickKitty(id): ${id}`);
         const newKittyIds = kittyIds.map((cat) => {
             if (cat.catId === id) {
                 var newCat = {...cat};
@@ -46,11 +25,11 @@ function Catalog() {
         });
         setKittyIds(newKittyIds);
     }
+    const getSalePrice = (price) => {
+        return price === "0" ? `Not for sale`: `Price: ${price} ETH`;
+    }
     const displayOwnedCats = () => {
         if (kittyIds) {
-            // {"0":"0","1":"0","2":"0","3":"2087534233176531","4":"1634217850","5":"0x3a715d283cC6276a3023005D69608677792Fa04d","6":"6",
-            //  "mumId":"0","dadId":"0","generation":"0","genes":"2087534233176531","birthTime":"1634217850",
-            //  "kittyOwner":"0x3a715d283cC6276a3023005D69608677792Fa04d","catId":"6","selected":false},
             return kittyIds.map(value => 
                 <div className="catalogCat" key={value.catId} >
                     <button type="button" 
@@ -66,23 +45,24 @@ function Catalog() {
                             <div>Mom: {value.mumId}</div>
                             <div>Dad: {value.dadId}</div>
                         </div>
+                        <div>{getSalePrice(value.price)}</div>
                     </button>
                 </div>
             );
         }
     }
     React.useEffect(() => {
-        if (!kittyIds) {
-            loadKittyIds();
+        if (!kittyIds && kittyContractInstance && kittyContractInstance.methods) {
+            loadKittyIds(accounts, kittyContractInstance, setKittyIds, kittyContractInstance.methods.getKittyList);
         }
-    })
+    }, [setKittyIds, accounts, kittyContractInstance, kittyIds])
 
     const getSelectedCats = () => {
         if (kittyIds){
             const selectedIds = kittyIds.filter((cat) => {
                 if (cat.selected === true)
                     return cat;
-                assert.equal(cat.selected, false);
+                assert.equal(cat.selected, false, `cat.selected is not true or false: ${typeof(cat.selected)}:${cat.selected}`);
                 return undefined;
             });
             return selectedIds;
@@ -91,21 +71,23 @@ function Catalog() {
     }
 
     const selectedCats = getSelectedCats();//kittyIds ? kittyIds.filter((cat) => cat.selected === true) : [];;
-    console.log(`selectedCats: ${selectedCats.length}`);
 
     const onClickBreedSelected = (event) => {
-        console.log(`onClickBreedSelected`);
         const sire = selectedCats[0];
         const dame = selectedCats[1];
         if (kittyContractInstance) {
             kittyContractInstance.methods.breed(sire.catId, dame.catId).send({ from: accounts[0] }, function(error, txHash) {
                 if (error)
-                    alert(error);
+                    alert(error.message);
                 else
                     console.log(txHash);
             });
-            loadKittyIds();
         }
+    }
+
+    const onClickSellOnMarketPlace = (event) => {
+        event.preventDefault();
+        setShowMarketPriceDialog(true);
     }
 
     const onClickTransfer = async (event) => {
@@ -118,23 +100,32 @@ function Catalog() {
         return selectedCats.length !== 2;
     }
 
+    const getMarketPlaceButtonState = () => {
+        return selectedCats.length !== 1;
+    }
+
     const getTransferButtonState = () => {
         // false means enabled
         return selectedCats.length === 0;
     }
     const [showTransferToDialog, setShowTransferToDialog] = React.useState(false);
+    const [showMarketPriceDialog, setShowMarketPriceDialog] = React.useState(false);
 
     return (
         <div className="Catalog">
             <TransferToDialogContext.Provider value={{ showTransferToDialog, setShowTransferToDialog }}>
-                <h2>Kitties catalog</h2>
-                <h3>Select kitties to breed or transfer</h3>
-                <div className="container p-3 catalogCats">{displayOwnedCats()}</div>
-                <div className="homeButtonBar col-lg-11">
-                    <button type="button" disabled={getBreedSelectedButtonState()} className="btn btn-primary" onClick={onClickBreedSelected}>Breed selected</button>
-                    <button type="button" disabled={getTransferButtonState()} className="btn btn-primary" onClick={onClickTransfer}>Transfer</button>
-                </div>
-                <TransferToDialog reload={loadKittyIds} list={selectedCats.map(cat => cat.catId)} />
+                <MarketPriceDialogContext.Provider value={{ showMarketPriceDialog, setShowMarketPriceDialog }}>
+                    <h2>Kitties catalog</h2>
+                    <h3>Select kitties to breed or transfer</h3>
+                    <div className="container p-3 catalogCats">{displayOwnedCats()}</div>
+                    <div className="homeButtonBar col-lg-11">
+                        <button type="button" disabled={getBreedSelectedButtonState()} className="btn btn-primary" onClick={onClickBreedSelected}>Breed selected</button>
+                        <button type="button" disabled={getMarketPlaceButtonState()} className="btn btn-primary" onClick={onClickSellOnMarketPlace}>Sell on MarketPlace</button>
+                        <button type="button" disabled={getTransferButtonState()} className="btn btn-primary" onClick={onClickTransfer}>Transfer</button>
+                    </div>
+                    <TransferToDialog list={selectedCats.map(cat => cat.catId)} />
+                    <MarketPriceDialog list={selectedCats.map(cat => cat.catId)} />
+                </MarketPriceDialogContext.Provider>
             </TransferToDialogContext.Provider>
         </div>
     )
