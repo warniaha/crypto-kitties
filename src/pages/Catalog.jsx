@@ -12,7 +12,7 @@ function Catalog() {
     const { accounts, kittyContractInstance } = React.useContext(KittiesContext);
     const [ kittyIds, setKittyIds] = React.useState();
     const getButtonSelectedClass = (selection) => {
-        return selection ? "btn btn-primary" : "btn btn-secondary";
+        return selection ? "btn btn-primary" : "btn btn-success";
     }
     const onClickKitty = (id) => {
         const newKittyIds = kittyIds.map((cat) => {

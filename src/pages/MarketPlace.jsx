@@ -28,10 +28,6 @@ function MarketPlace() {
         });
         setKittyIds(newKittyIds);
     }
-    /*
-        const from = selectedCats[0].kittyOwner.toLowerCase();
-        const to = accounts[0].toLowerCase();
-     */
     const displayForSaleCats = () => {
         if (kittyIds) {
             return kittyIds.map(value => 
@@ -58,6 +54,12 @@ function MarketPlace() {
     React.useEffect(() => {
         if (!kittyIds && kittyContractInstance && kittyContractInstance.methods) {
             loadKittyIds(accounts, kittyContractInstance, setKittyIds, kittyContractInstance.methods.getKittiesForSale);
+            kittyContractInstance.events.TokenPrice().on('data', function(event){
+                loadKittyIds(accounts, kittyContractInstance, setKittyIds, kittyContractInstance.methods.getKittiesForSale);
+            });
+            kittyContractInstance.events.Purchase().on('data', function(event){
+                loadKittyIds(accounts, kittyContractInstance, setKittyIds, kittyContractInstance.methods.getKittiesForSale);
+            });
         }
     }, [setKittyIds, accounts, kittyContractInstance, kittyIds]);
 
