@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/crypto-kitties/static/css/main.355b4992.chunk.css",
-    "main.js": "/crypto-kitties/static/js/main.14508093.chunk.js",
-    "main.js.map": "/crypto-kitties/static/js/main.14508093.chunk.js.map",
+    "main.js": "/crypto-kitties/static/js/main.f82cdbf7.chunk.js",
+    "main.js.map": "/crypto-kitties/static/js/main.f82cdbf7.chunk.js.map",
     "runtime-main.js": "/crypto-kitties/static/js/runtime-main.ae25c138.js",
     "runtime-main.js.map": "/crypto-kitties/static/js/runtime-main.ae25c138.js.map",
     "static/css/2.d2070878.chunk.css": "/crypto-kitties/static/css/2.d2070878.chunk.css",
@@ -21,6 +21,6 @@
     "static/css/2.d2070878.chunk.css",
     "static/js/2.f4d7e90b.chunk.js",
     "static/css/main.355b4992.chunk.css",
-    "static/js/main.14508093.chunk.js"
+    "static/js/main.f82cdbf7.chunk.js"
   ]
 }
