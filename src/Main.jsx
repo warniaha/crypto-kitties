@@ -34,7 +34,7 @@ const Main = () => {
   }
   
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <KittiesNavBar/>
       <Switch> {/* The Switch decides which component to show based on the current URL.*/}
         <KittiesContext.Provider value={{ accounts, kittyContractInstance, kittyContractOwner }}>
