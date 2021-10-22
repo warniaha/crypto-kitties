@@ -68,3 +68,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### deploy to Goerli
+npx mnemonics
+Use the resulting mnemonic in secrets.json (rename from secrets.json.txt)
+Fund the account by sending Ether to web3.eth.getAccounts()[0] (in truffle console)
+truffle migrate
+Create a few gen 0 kitties and set a purchase price on them

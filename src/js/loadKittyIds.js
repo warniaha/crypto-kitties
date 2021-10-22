@@ -8,8 +8,6 @@ export const updateKittyPrice = async (accounts, kittyContractInstance, kittyIds
         if (cat.catId === kittyId) {
             var catCopy = {...cat};
             catCopy.price = Web3.utils.fromWei(price);
-            console.log(`catCopy: ${JSON.stringify(catCopy)}`);
-            debugger;
             return catCopy;
         }
         return cat;

@@ -1,8 +1,12 @@
 import React from 'react';
 import Cat from '../components/Cat'
 import { defaultDnaString } from '../js/dna';
+import { KittiesContext } from '../KittiesContext';
+const Web3 = require("web3");
 
 function Home() {
+    const { accounts, kittyContractInstance } = React.useContext(KittiesContext);
+    const [balance, setBalance] = React.useState(0);
     const dna1 = "4974533712209821";
     const dna2 = "1872596321315231";
     const dna3 = "9048774123147811";
@@ -76,7 +80,69 @@ function Home() {
                     'zIndex': '5',
                 };
         }
+    }
 
+    const getMetaMask = () => {
+        if (kittyContractInstance)
+            return (<></>);
+        return (
+            <>
+                <li className="c-white">To purchase kitties, you will need to install MetaMask
+                    <br></br>
+                    <a href="https://metamask.io/">https://metamask.io/</a>
+                </li>
+                <li className="c-white">Then connect MetaMask to the Goerli network.
+                    <br></br>
+                    <a href="https://mudit.blog/getting-started-goerli-testnet/">https://mudit.blog/getting-started-goerli-testnet/</a>
+                </li>
+            </>
+        );
+    }
+    React.useEffect(() => {
+        if (accounts) {
+            var web3 = new Web3(Web3.givenProvider);
+            web3.eth.getBalance(accounts[0], function (err, result) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    setBalance(web3.utils.fromWei(result, "ether"));
+                }
+            });
+        }
+    }, [setBalance, accounts]);
+
+    const getBalance = () => {
+        if (balance > 0)
+            return (
+                <>
+                    <div className="c-white">Your current balance is: {balance} Goerli test ETH</div>
+                </>
+            );
+        return (
+            <>
+                <div className="container p-5 listCats" align="left">
+                    <ul>
+                        <li className="c-white">This site uses the Goerli test network.</li>
+                        {getMetaMask()}
+                        {getEther()}
+                    </ul>
+                </div>
+            </>
+        );
+    }
+
+    const getEther = () => {
+        if (balance > 0) {
+            return (<></>);
+        }
+        return (
+            <>
+                <li className="c-white">You will need to fund your account with some test Ether
+                    <br></br>
+                    <a href="https://goerli-faucet.slock.it/">https://goerli-faucet.slock.it/</a>
+                </li>
+            </>
+        );        
     }
 
     return (
@@ -102,6 +168,7 @@ function Home() {
             <br></br>
             <br></br>
             <br></br>
+            {getBalance()}
         </div>
     )
 }

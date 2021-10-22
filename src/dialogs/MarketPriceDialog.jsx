@@ -5,7 +5,7 @@ import { KittiesContext } from '../KittiesContext';
 import BigNumber from "bignumber.js";
 
 const Web3 = require("web3");
-const sellPriceGreaterThanZero = "Sell price must be greater than zero";
+const sellPriceGreaterThanZero = "Sell price must be greater than zero ETH";
 
 export default function MarketPriceDialog(props) {
     const {showMarketPriceDialog, setShowMarketPriceDialog} = React.useContext(MarketPriceDialogContext);
@@ -38,7 +38,7 @@ export default function MarketPriceDialog(props) {
         const bigNum = new BigNumber(dollarAmount);
         const status = bigNum.isGreaterThan(0);
         setTextFieldStatus(status);
-        setTextFieldMessage(status ? "Valid sell price" : sellPriceGreaterThanZero);
+        setTextFieldMessage(status ? "Valid ETH sell price" : sellPriceGreaterThanZero);
         setSellAmount(dollarAmount);
     }
 

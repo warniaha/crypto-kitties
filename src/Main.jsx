@@ -10,7 +10,8 @@ import { KittiesContext } from './KittiesContext';
 import { abi } from './abi.js';
 
 const Web3 = require("web3");
-const contractAddress = "0x0d59911558E979D8C12296ff1A7e051279d4B9d0";
+const contractAddressLocal = "0xd03Ac2a704Dbe7b869DB53D5102bC420358979fd";
+const contractAddressGoerli = "0x0881bBc332B6654B538FE562C7541188DA510E03";
 
 const Main = () => {
   const [accounts, setAccounts] = React.useState();
@@ -18,21 +19,16 @@ const Main = () => {
   const [kittyContractOwner, setKittyContractOwner] = React.useState();
 
   if (!accounts) {
+    console.log(`Loading accounts...`);
     // window.ethereum will be undefined during unit tests
     if (window.ethereum) {
+      console.log(`Checking window.ethereum...`);
       window.ethereum.enable().then(accts => {
+        console.log(`loaded accts[0]: ${accts[0]}`);
         setAccounts(accts);
         var web3 = new Web3(Web3.givenProvider);
-        const instance = new web3.eth.Contract(abi, contractAddress, { from: accts[0] });
+        const instance = new web3.eth.Contract(abi, contractAddressGoerli, { from: accts[0] });
         setKittyContractInstance(instance);
-
-        // instance.events.Birth().on('data', function(event){
-        // });
-        // instance.events.Purchase().on('data', function(event){
-        // });
-        // instance.events.TokenPrice().on('data', function(event){
-        // });
-
         instance.methods.getOwnerAddress().call({from: accts[0]}).then(async (owner) => {
           setKittyContractOwner(owner);
         });

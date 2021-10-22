@@ -31,7 +31,6 @@ export default function TransferToDialog(props) {
     }
 
     const onValidator = (value) => {
-        debugger;
         const status = value.match(regexEthereumAddress);
         setTextFieldStatus(status);
         setTextFieldMessage(status ? "Matches valid Ethereum address" : doesNotMatchEthAddr)
