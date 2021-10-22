@@ -69,6 +69,8 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
+### `npm run deploy` to deploy to homepage defined in package.json "homepage" setting
+
 ### deploy to Goerli
 npx mnemonics
 Use the resulting mnemonic in secrets.json (rename from secrets.json.txt)
