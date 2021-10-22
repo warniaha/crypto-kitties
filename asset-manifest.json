@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/crypto-kitties/static/css/main.355b4992.chunk.css",
+    "main.js": "/crypto-kitties/static/js/main.14508093.chunk.js",
+    "main.js.map": "/crypto-kitties/static/js/main.14508093.chunk.js.map",
+    "runtime-main.js": "/crypto-kitties/static/js/runtime-main.ae25c138.js",
+    "runtime-main.js.map": "/crypto-kitties/static/js/runtime-main.ae25c138.js.map",
+    "static/css/2.d2070878.chunk.css": "/crypto-kitties/static/css/2.d2070878.chunk.css",
+    "static/js/2.f4d7e90b.chunk.js": "/crypto-kitties/static/js/2.f4d7e90b.chunk.js",
+    "static/js/2.f4d7e90b.chunk.js.map": "/crypto-kitties/static/js/2.f4d7e90b.chunk.js.map",
+    "static/js/3.f618d809.chunk.js": "/crypto-kitties/static/js/3.f618d809.chunk.js",
+    "static/js/3.f618d809.chunk.js.map": "/crypto-kitties/static/js/3.f618d809.chunk.js.map",
+    "index.html": "/crypto-kitties/index.html",
+    "static/css/2.d2070878.chunk.css.map": "/crypto-kitties/static/css/2.d2070878.chunk.css.map",
+    "static/css/main.355b4992.chunk.css.map": "/crypto-kitties/static/css/main.355b4992.chunk.css.map",
+    "static/js/2.f4d7e90b.chunk.js.LICENSE.txt": "/crypto-kitties/static/js/2.f4d7e90b.chunk.js.LICENSE.txt",
+    "static/media/mystyle.css": "/crypto-kitties/static/media/Poppins-Light.53e02b63.ttf"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.ae25c138.js",
+    "static/css/2.d2070878.chunk.css",
+    "static/js/2.f4d7e90b.chunk.js",
+    "static/css/main.355b4992.chunk.css",
+    "static/js/main.14508093.chunk.js"
+  ]
+}
