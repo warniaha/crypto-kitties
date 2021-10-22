@@ -19,9 +19,12 @@ const Main = () => {
   const [kittyContractOwner, setKittyContractOwner] = React.useState();
 
   if (!accounts) {
+    console.log(`Loading accounts...`);
     // window.ethereum will be undefined during unit tests
     if (window.ethereum) {
+      console.log(`Checking window.ethereum...`);
       window.ethereum.enable().then(accts => {
+        console.log(`loaded accts[0]: ${accts[0]}`);
         setAccounts(accts);
         var web3 = new Web3(Web3.givenProvider);
         const instance = new web3.eth.Contract(abi, contractAddressGoerli, { from: accts[0] });
